@@ -1,11 +1,15 @@
-import typing
 from datetime import date
 
 from fastapi import APIRouter
-from pydantic import BaseModel, ConfigDict
 
 # from fastapi.responses import JSONResponse
-from models.procedure import Procedure
+from models.procedure import (
+    FinancialReport,
+    GlossedReport,
+    NewProcedure,
+    Procedure,
+    ProcedureDetail,
+)
 
 blueprint_name = "procedure"
 
@@ -35,31 +39,65 @@ Por favor, compartilhe o link do repositório Git com o código-fonte e inclua:
  - Explicação de como a API lida com erros e exceções.
  - Explicação de como a API garante a segurança dos dados."""
 
-
-class NewProcedure(BaseModel):
-    doctor_id: int
-    patient_id: int
-    date: date
-    value: float
-    payment_status: typing.Literal["paid", "pending", "glossed"]
-
-
-class ProcedureDetail(NewProcedure):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    doctor: str
-    patient: str
+# TODO ADD AUTH, VALIDATION, ERROR HANDLING
 
 
 @router.post("/registry", response_model=ProcedureDetail)
 async def create_procedure(procedure: NewProcedure) -> ProcedureDetail:
+    """
+    Create a new procedure.
+
+    @JSON Params:\n
+        - doctor_id: ID of the doctor\n
+        - patient_id: ID of the patient\n
+        - date: Date of the procedure\n
+        - value: Value of the procedure\n
+        - payment_status: Payment status of the procedure (paid, pending, glossed)\n
+
+    @Return:\n
+        - ProcedureDetail: Details of the created procedure\n
+            * id: ID of the procedure\n
+            * doctor_id: ID of the doctor\n
+            * patient_id: ID of the patient\n
+            * date: Date of the procedure\n
+            * value: Value of the procedure\n
+            * payment_status: Payment status of the procedure (paid, pending, glossed)\n
+    """
     db_procedure = Procedure(**procedure.model_dump())
-    db_procedure.save()
+    db_procedure.create()
     return db_procedure
 
 
 @router.get("/report/daily", response_model=list[ProcedureDetail])
 async def get_daily_report() -> list[ProcedureDetail]:
-    procedures = Procedure.create()
-    return procedures
+    """
+    Get daily report of procedures by doctor.
+    """
+    return Procedure.filter(date=date.today())
+
+
+@router.post("/report/glossed", response_model=list[ProcedureDetail])
+async def get_glossed_report(data: GlossedReport) -> list[ProcedureDetail]:
+    """
+    Get glossed report of procedures by period.
+    """
+    return Procedure.filter(
+        date__range=(data.start, data.end), payment_status="glossed"
+    )
+
+
+@router.get("/report/financial/{doctor_id}", response_model=list[FinancialReport])
+async def get_financial_report(doctor_id: int) -> list[FinancialReport]:
+    """
+    Get financial report of procedures by doctor.
+
+    @JSON Params:\n
+        - doctor_id: ID of the doctor\n
+
+    @Return:\n
+        - FinancialReport: Financial report of the doctor\n
+            * total_value: Total value of the procedures\n
+            * procedures: Number of procedures\n
+            * status: Status of the payment (paid, pending, glossed)\n
+    """
+    return Procedure.get_financial_report(doctor_id=doctor_id)
