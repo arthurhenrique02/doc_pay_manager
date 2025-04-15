@@ -16,7 +16,7 @@ from passlib.context import CryptContext
 PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
-OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="token")
+OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 
 class IAuth:

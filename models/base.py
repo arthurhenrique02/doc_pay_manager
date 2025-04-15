@@ -43,7 +43,6 @@ class Base(DeclarativeBase):
             getattr(cls, key) == value for key, value in kwargs.items()
         ]
 
-        print(remaining_filters)
         all_filters = range_filters + remaining_filters
 
         return (
