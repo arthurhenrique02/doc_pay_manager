@@ -1,6 +1,6 @@
 from datetime import date
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 # from fastapi.responses import JSONResponse
 from models.procedure import (
@@ -10,6 +10,7 @@ from models.procedure import (
     Procedure,
     ProcedureDetail,
 )
+from models.user import User
 
 blueprint_name = "procedure"
 
@@ -41,9 +42,14 @@ Por favor, compartilhe o link do repositório Git com o código-fonte e inclua:
 
 # TODO ADD AUTH, VALIDATION, ERROR HANDLING
 
+USER_AUTH = User()
+
 
 @router.post("/registry", response_model=ProcedureDetail)
-async def create_procedure(procedure: NewProcedure) -> ProcedureDetail:
+async def create_procedure(
+    procedure: NewProcedure,
+    current_user: dict = Depends(USER_AUTH.get_current_user),
+) -> ProcedureDetail:
     """
     Create a new procedure.
 
@@ -69,7 +75,9 @@ async def create_procedure(procedure: NewProcedure) -> ProcedureDetail:
 
 
 @router.get("/report/daily", response_model=list[ProcedureDetail])
-async def get_daily_report() -> list[ProcedureDetail]:
+async def get_daily_report(
+    current_user: dict = Depends(USER_AUTH.get_current_user),
+) -> list[ProcedureDetail]:
     """
     Get daily report of procedures by doctor.
     """
@@ -77,7 +85,10 @@ async def get_daily_report() -> list[ProcedureDetail]:
 
 
 @router.post("/report/glossed", response_model=list[ProcedureDetail])
-async def get_glossed_report(data: GlossedReport) -> list[ProcedureDetail]:
+async def get_glossed_report(
+    data: GlossedReport,
+    current_user: dict = Depends(USER_AUTH.get_current_user),
+) -> list[ProcedureDetail]:
     """
     Get glossed report of procedures by period.
     """
@@ -87,7 +98,10 @@ async def get_glossed_report(data: GlossedReport) -> list[ProcedureDetail]:
 
 
 @router.get("/report/financial/{doctor_id}", response_model=list[FinancialReport])
-async def get_financial_report(doctor_id: int) -> list[FinancialReport]:
+async def get_financial_report(
+    doctor_id: int,
+    current_user: dict = Depends(USER_AUTH.get_current_user),
+) -> list[FinancialReport]:
     """
     Get financial report of procedures by doctor.
 
