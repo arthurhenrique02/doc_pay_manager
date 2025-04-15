@@ -1,4 +1,4 @@
-from sqlalchemy import and_
+from sqlalchemy import and_, exists
 from sqlalchemy.orm import DeclarativeBase
 
 from .engine import get_db
@@ -45,9 +45,18 @@ class Base(DeclarativeBase):
 
         all_filters = range_filters + remaining_filters
 
-        return (
-            cls.__database.query(cls).filter(and_(*all_filters)).order_by(cls.id.asc())
-        )
+        return cls.__database.query(cls).filter(and_(*all_filters))
+
+    @classmethod
+    def exists(cls, **kwargs) -> bool:
+        """
+        Check if a record exists in the database.
+        """
+        return cls.__database.query(
+            exists().where(
+                *[getattr(cls, key) == value for key, value in kwargs.items()]
+            )
+        ).scalar()
 
     def save(self):
         self.__database.commit()

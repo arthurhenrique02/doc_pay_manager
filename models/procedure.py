@@ -1,9 +1,11 @@
 import typing
 from datetime import date
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import AfterValidator, BaseModel, ConfigDict
 from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, Numeric, func
 from sqlalchemy.orm import relationship
+
+from validators.validators import doctor_exists, patient_exists
 
 from .base import Base
 
@@ -15,8 +17,8 @@ class FinancialReport(BaseModel):
 
 
 class NewProcedure(BaseModel):
-    doctor_id: int
-    patient_id: int
+    doctor_id: typing.Annotated[int, AfterValidator(doctor_exists)]
+    patient_id: typing.Annotated[int, AfterValidator(patient_exists)]
     date: date
     value: float
     payment_status: typing.Literal["paid", "pending", "glossed"]
@@ -31,7 +33,7 @@ class ProcedureDetail(NewProcedure):
 class GlossedReport(BaseModel):
     start: date
     end: date
-    doctor_id: int | None = None
+    doctor_id: typing.Annotated[int, AfterValidator(doctor_exists)]
 
 
 class Procedure(Base):
