@@ -2,7 +2,7 @@ import typing
 from datetime import date
 
 from fastapi import APIRouter
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 # from fastapi.responses import JSONResponse
 from models.procedure import Procedure
@@ -45,12 +45,11 @@ class NewProcedure(BaseModel):
 
 
 class ProcedureDetail(NewProcedure):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     doctor: str
     patient: str
-
-    class Config:
-        orm_mode = True
 
 
 @router.post("/registry", response_model=ProcedureDetail)
