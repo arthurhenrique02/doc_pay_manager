@@ -33,7 +33,6 @@ class ProcedureDetail(NewProcedure):
 class GlossedReport(BaseModel):
     start: date
     end: date
-    doctor_id: typing.Annotated[int, AfterValidator(doctor_exists)]
 
 
 class Procedure(Base):

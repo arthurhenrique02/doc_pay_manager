@@ -130,11 +130,31 @@ async def get_daily_report(
 @router.post("/report/glossed", response_model=list[ProcedureDetail])
 async def get_glossed_report(
     data: GlossedReport,
+    doctor_id: int | None = None,
     current_user: dict = Depends(USER_AUTH.get_current_user),
 ) -> list[ProcedureDetail]:
     """
     Get glossed report of procedures by period.
     """
+    current_doctor = Doctor.get_by_user_id(user_id=current_user.id)
+
+    # check if is search by doctor
+    if doctor_id:
+        if not current_doctor:
+            return JSONResponse(
+                status_code=400,
+                content={"message": "Doctor not found."},
+            )
+
+        if not current_user.is_superuser:
+            doctor_id = current_doctor.id
+
+        return Procedure.filter(
+            date__range=(data.start, data.end),
+            doctor_id=current_doctor.id,
+            payment_status="glossed",
+        )
+
     return Procedure.filter(
         date__range=(data.start, data.end), payment_status="glossed"
     )
