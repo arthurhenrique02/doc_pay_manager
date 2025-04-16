@@ -3,6 +3,7 @@ import os
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy.orm import relationship
 
 from .auth import IAuth
 from .base import Base
@@ -22,6 +23,7 @@ class TokenData(BaseModel):
 
 
 class UserDetail(BaseModel):
+    id: int | None = None
     username: str
     is_superuser: bool | None = None
 
@@ -44,8 +46,7 @@ class User(Base, IAuth):
     password = Column(String, nullable=False)
     is_superuser = Column(Boolean, nullable=False, default=False)
 
-    # doctor = relationship("Doctor", back_populates="user")
-    # patient = relationship("Patient", back_populates="user")
+    doctor = relationship("Doctor", back_populates="user")
 
     @classmethod
     def authenticate_user(cls, username: str, password: str) -> UserInDB | bool:
@@ -66,6 +67,7 @@ class User(Base, IAuth):
             return False
 
         return UserInDB(
+            id=user.id,
             username=user.username,
             is_superuser=user.is_superuser,
             hashed_password=user.password,

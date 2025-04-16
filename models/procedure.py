@@ -5,7 +5,7 @@ from pydantic import AfterValidator, BaseModel, ConfigDict
 from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, Numeric, func
 from sqlalchemy.orm import relationship
 
-from validators.validators import doctor_exists, patient_exists
+from validators.validators import doctor_exists, patient_exists, value_is_number
 
 from .base import Base
 
@@ -20,7 +20,7 @@ class NewProcedure(BaseModel):
     doctor_id: typing.Annotated[int, AfterValidator(doctor_exists)]
     patient_id: typing.Annotated[int, AfterValidator(patient_exists)]
     date: date
-    value: float
+    value: typing.Annotated[float, AfterValidator(value_is_number)]
     payment_status: typing.Literal["paid", "pending", "glossed"]
 
 

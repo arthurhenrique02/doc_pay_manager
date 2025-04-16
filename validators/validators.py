@@ -38,3 +38,40 @@ def patient_exists(patient_id: int) -> int:
         raise ValueError(f"Patient with id {patient_id} does not exist.")
 
     return patient_id
+
+
+def value_is_number(value: float) -> float:
+    """
+    Check if a value is a number.
+
+    @Params:
+        - value: Value to be checked
+
+    @Return:
+        - True if the value is a number, False otherwise
+    """
+    if not isinstance(value, (int, float)):
+        raise ValueError("Value must be a number.")
+
+    return value
+
+
+def user_exists(user_id: int) -> int:
+    """
+    Check if a user exists in the database.
+
+    @Params:
+        - user_id: ID of the user
+
+    @Return:
+        - True if the user exists, False otherwise
+    """
+    from models.user import User
+
+    if not isinstance(user_id, int) or user_id <= 0:
+        raise ValueError("User id must be an integer greater than 0.")
+
+    if not User.exists(id=user_id):
+        raise ValueError(f"User with id {user_id} does not exist.")
+
+    return user_id
