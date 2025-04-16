@@ -5,35 +5,31 @@ from .engine import get_db
 
 
 class Base(DeclarativeBase):
-    __database = next(get_db())
+    _database = next(get_db())
 
     def create(self):
-        self.__database.add(self)
+        self._database.add(self)
         self.save()
 
     def update(self, id: int) -> None:
         instance = (
-            self.__database.query(self.__class__)
-            .filter(self.__class__.id == id)
-            .first()
+            self._database.query(self.__class__).filter(self.__class__.id == id).first()
         )
         self.save()
         return instance
 
     def delete(self, id: int) -> bool:
         instance = (
-            self.__database.query(self.__class__)
-            .filter(self.__class__.id == id)
-            .first()
+            self._database.query(self.__class__).filter(self.__class__.id == id).first()
         )
         if instance:
-            self.__database.delete(instance)
+            self._database.delete(instance)
             self.save()
             return True
         return False
 
     def get(self, id: int):
-        return self.__database.query(self.__class__).get(id)
+        return self._database.query(self.__class__).get(id)
 
     @classmethod
     def filter(cls, **kwargs):
@@ -45,22 +41,22 @@ class Base(DeclarativeBase):
 
         all_filters = range_filters + remaining_filters
 
-        return cls.__database.query(cls).filter(and_(*all_filters))
+        return cls._database.query(cls).filter(and_(*all_filters))
 
     @classmethod
     def exists(cls, **kwargs) -> bool:
         """
         Check if a record exists in the database.
         """
-        return cls.__database.query(
+        return cls._database.query(
             exists().where(
                 *[getattr(cls, key) == value for key, value in kwargs.items()]
             )
         ).scalar()
 
     def save(self):
-        self.__database.commit()
-        self.__database.refresh(self)
+        self._database.commit()
+        self._database.refresh(self)
 
     @classmethod
     def __create_range_filter(cls, kwargs: dict) -> list:

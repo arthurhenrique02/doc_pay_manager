@@ -55,8 +55,13 @@ class Procedure(Base):
         """
         Get financial report of procedures by doctor.
         """
-        return cls.__database.query(
-            func.sum(cls.value).label("total_value"),
-            func.count(cls.id).label("procedures"),
-            cls.status,
-        ).filter(cls.doctor_id == doctor_id)
+        return (
+            cls._database.query(
+                func.sum(cls.value).label("total_value"),
+                func.count(cls.id).label("procedures"),
+                cls.payment_status.label("status"),
+            )
+            .filter(cls.doctor_id == doctor_id)
+            .group_by(cls.payment_status)
+            .all()
+        )
