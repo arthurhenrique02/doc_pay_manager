@@ -1,8 +1,9 @@
 from datetime import date
 
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 
-# from fastapi.responses import JSONResponse
+from models.doctor import Doctor
 from models.procedure import (
     FinancialReport,
     GlossedReport,
@@ -69,6 +70,27 @@ async def create_procedure(
             * value: Value of the procedure\n
             * payment_status: Payment status of the procedure (paid, pending, glossed)\n
     """
+    # if superuser, enable insetion withou checking doctor id
+    if current_user.is_superuser:
+        if not procedure.doctor_id or not procedure.patient_id:
+            return JSONResponse(
+                status_code=400,
+                content={"message": "Doctor and patient IDs are required."},
+            )
+
+        db_procedure = Procedure(**procedure.model_dump())
+        db_procedure.create()
+        return db_procedure
+
+    # is not a doctor
+    if not Doctor.exists(user_id=current_user.id):
+        return JSONResponse(
+            status_code=400,
+            content={"message": "Doctor not found."},
+        )
+
+    # change procedure ID to the current doctor ID
+    procedure.doctor_id = Doctor.get_by_user_id(user_id=current_user.id).id
     db_procedure = Procedure(**procedure.model_dump())
     db_procedure.create()
     return db_procedure
@@ -76,12 +98,33 @@ async def create_procedure(
 
 @router.get("/report/daily", response_model=list[ProcedureDetail])
 async def get_daily_report(
+    doctor_id: int | None = None,
     current_user: dict = Depends(USER_AUTH.get_current_user),
 ) -> list[ProcedureDetail]:
     """
     Get daily report of procedures by doctor.
     """
-    return Procedure.filter(date=date.today())
+    current_doctor = Doctor.get_by_user_id(user_id=current_user.id)
+
+    # if super user, check if is a doctor or selected some doctor
+    if current_user.is_superuser:
+        if not doctor_id and not current_doctor:
+            return JSONResponse(
+                status_code=400,
+                content={"message": "Doctor is required."},
+            )
+
+        if not doctor_id:
+            doctor_id = current_doctor.id
+        return Procedure.filter(date=date.today(), doctor_id=doctor_id)
+
+    if not current_doctor:
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Doctor not found."},
+        )
+
+    return Procedure.filter(date=date.today(), doctor_id=current_doctor.id)
 
 
 @router.post("/report/glossed", response_model=list[ProcedureDetail])
