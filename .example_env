@@ -1,0 +1,4 @@
+DB_URL=postgresql://admin:admin@localhost:5432/doc_pay_manager
+SECRET_KEY=98a15dcc0d13007a21588acbbdcf32b52d53ff227e297c4ae4a0faa8c34f2b6a
+ALGORITHM=HS512
+ACCESS_TOKEN_EXPIRE_MINUTES=24000
