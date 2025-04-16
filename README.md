@@ -6,13 +6,13 @@
 
 :small_blue_diamond: [Configurando ambiente](#Configurando-ambiente)
 
-:small_blue_diamond: [Rodando aplicação](#Rodando-aplicacao)
+:small_blue_diamond: [Rodando aplicação](#Rodando-aplicação)
 
 :small_blue_diamond: [Endpoints](#Endpoints)
 
 :small_blue_diamond: [Tratamento de erro](#Tratamento-de-erro)
 
-:small_blue_diamond: [Segurança de dados](#Seguranca-de-dados)
+:small_blue_diamond: [Segurança de dados](#Segurança-de-dados)
 
 ## Requisitos
 
