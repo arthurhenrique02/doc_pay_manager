@@ -142,7 +142,7 @@ async def get_glossed_report(
     if doctor_id:
         if not current_doctor:
             return JSONResponse(
-                status_code=400,
+                status_code=404,
                 content={"message": "Doctor not found."},
             )
 
@@ -177,4 +177,23 @@ async def get_financial_report(
             * procedures: Number of procedures\n
             * status: Status of the payment (paid, pending, glossed)\n
     """
+    current_doctor = Doctor.get_by_user_id(user_id=current_user.id)
+
+    if current_user.is_superuser:
+        if not doctor_id and not current_doctor:
+            return JSONResponse(
+                status_code=400,
+                content={"message": "Doctor is required."},
+            )
+
+        if not doctor_id:
+            doctor_id = current_doctor.id
+        return Procedure.get_financial_report(doctor_id=doctor_id)
+
+    if doctor_id != current_doctor.id:
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Doctor not found."},
+        )
+
     return Procedure.get_financial_report(doctor_id=doctor_id)
