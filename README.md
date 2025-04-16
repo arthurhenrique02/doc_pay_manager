@@ -198,15 +198,17 @@ Obtém um relatório diário de procedimentos para o médico atual ou um médico
 
 Obtém um relatório de procedimentos glosados dentro de um intervalo de datas especificado.
 
+
 ##### Requisição
 ```json
 {
   "start": "2023-10-01",
-  "end": "2023-10-31"
-  "doctor_id: int | null
+  "end": "2023-10-31",
+  
 }
 ```
-OBS.: doctor_id é um parâmetro opcional caso o usuário deseje pesquisar por suas glosas ou o superusuário pesquise pelo dele ou de algum outro médico.
+- Parâmetros
+  - doctor_id (int ou null): parâmetro opcional para pesquisar glosas por um médico em especifico
 
 ##### Resposta
 ```json
