@@ -84,13 +84,6 @@ class IAuth:
             raise credentials_exception
         return user
 
-    async def get_current_active_user(
-        current_user: Annotated[UserDetail, Depends(get_current_user)],
-    ):
-        from models.user import UserDetail  # noqa: F401
-
-        return current_user
-
     @classmethod
     @abstractmethod
     def get_by_username(cls, username: str) -> UserDetail | None:
