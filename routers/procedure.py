@@ -21,28 +21,6 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-
-"""A API deve ter endpoints para:
-
- - Cadastrar um novo procedimento médico com os seguintes dados:
-    - ID do médico
-    - ID do paciente
-    - Data do procedimento
-    - Valor do procedimento
-    - Status do pagamento (pago, pendente, glosado)
- - Gerar um relatório diário de procedimentos por médico.
- - Gerar um relatório de glosas por período.
- - Gerar um relatório financeiro por médico.
-
-
-Por favor, compartilhe o link do repositório Git com o código-fonte e inclua:
-
- - A documentação da API (pode ser em formato Swagger).
- - Explicação de como a API lida com erros e exceções.
- - Explicação de como a API garante a segurança dos dados."""
-
-# TODO ADD AUTH, VALIDATION, ERROR HANDLING
-
 USER_AUTH = User()
 
 
