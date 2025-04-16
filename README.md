@@ -38,7 +38,17 @@ pip install -r requirements.txt
   -  SECRET_KEY: string hex 32 criada e utilizada para criptografia da senha do user
   -  ALGORITHM: Algoritmo de criptografia utilizado para criptografar a senha do user. Habilitado uso dos algoritmos HS. Para utilizar RS ou algum outro é necessário uma instalação adicional
   -  ACCESS_TOKEN_EXPIRE_MINUTES (não obrigatório. Padrão 30 min): Tempo de expiração do JWT
-- Veja o arquivo `.example_env` para um melhor exemplo
+  - Veja o arquivo `.example_env` para um melhor exemplo
+- Caso deseje criar uma nova secret key (diferente da presente na .example_env), abra o python shell digitando 'python' no terminal e rode:
+  ```python
+    import secrets
+    secrets.token_hex(32)
+  ```
+- Para criar as tabelas no banco de dados, é preciso rodar um comando com o alembic:
+  ```sh
+    alembic upgrade head
+  ```
+
 
 ## Rodando aplicação
 - Para rodar a aplicação é necessário estar com o PostgrelSQL e a .env configurados
